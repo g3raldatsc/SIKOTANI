@@ -46,6 +46,7 @@ public partial class FormUtama : Form
         _pengguna = Sesi.PenggunaAktif
             ?? throw new InvalidOperationException("Belum ada sesi masuk.");
         _modul[MenuAplikasi.Keanggotaan] = () => new FormKeanggotaan();
+        _modul[MenuAplikasi.DanaAnggota] = () => new FormDanaAnggota();
 
         Text = "SIKOTANI - Sistem Informasi Koperasi Tani";
         StartPosition = FormStartPosition.CenterScreen;
