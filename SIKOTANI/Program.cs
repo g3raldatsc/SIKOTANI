@@ -3,6 +3,7 @@ using SIKOTANI.Data;
 namespace SIKOTANI;
 
 // im not gay
+// aman aja
 internal static class Program
 {
     [STAThread]
