@@ -1,19 +1,16 @@
-using SIKOTANI.Data;
+﻿namespace SIKOTANI;
 
-namespace SIKOTANI;
-
-// im not gay
-// aman aja
 internal static class Program
 {
     [STAThread]
     static void Main()
     {
         ApplicationConfiguration.Initialize();
+        var auth = new AuthController();
 
         try
         {
-            if (PenggunaRepository.BelumAdaPengguna())
+            if (auth.BelumAdaPengguna())
             {
                 using var setup = new FormSetupAwal();
                 if (setup.ShowDialog() != DialogResult.OK) return;
