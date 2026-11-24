@@ -45,6 +45,8 @@ public partial class FormUtama : Form
 
         _modul[MenuAplikasi.Keanggotaan] = () => new FormKeanggotaan();
         _modul[MenuAplikasi.DanaAnggota] = () => new FormDanaAnggota();
+        _modul[MenuAplikasi.PengajuanPinjaman] = () => new HalamanPengajuan();
+        _modul[MenuAplikasi.PersetujuanPinjaman] = () => new HalamanPersetujuan();
 
         // KANAN: header dan isi
         var header = new Panel { Dock = DockStyle.Top, Height = 74, BackColor = Color.White };

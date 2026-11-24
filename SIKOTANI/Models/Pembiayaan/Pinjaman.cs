@@ -2,10 +2,10 @@
 
 public abstract class Pinjaman
 {
-    private readonly List<Angsuran> _angsuran = new(); // composition
+    private readonly List<Angsuran> _angsuran = new();   // composition
 
     public int IdPinjaman { get; internal set; }
-    public Anggota Anggota { get; } // association
+    public Anggota Anggota { get; }                      // association
     public int TenorBulan { get; }
     public decimal SukuBungaTahunan { get; }
     public DateOnly TanggalPengajuan { get; }
@@ -14,30 +14,52 @@ public abstract class Pinjaman
     public IReadOnlyList<Angsuran> JadwalAngsuran => _angsuran;
     public abstract string NamaJenis { get; }
 
+    // Pengajuan baru: berlaku aturan B2 (hanya anggota Aktif)
     protected Pinjaman(int idPinjaman, Anggota anggota, int tenorBulan,
                        ParameterKoperasi parameter, DateOnly tanggalPengajuan)
+        : this(idPinjaman, anggota, tenorBulan, parameter.BungaPinjamanBerlaku, tanggalPengajuan)
     {
-        if (!anggota.Aktif) // B2
+        if (!anggota.Aktif)
             throw new AturanBisnisException(
                 "Hanya anggota Aktif yang dapat mengajukan pinjaman.");
+    }
+
+    // Pemulihan dari database: data sudah divalidasi saat pengajuan, dan
+    // suku bunga memakai nilai yang tersimpan (bukan parameter hari ini)
+    protected Pinjaman(int idPinjaman, Anggota anggota, int tenorBulan,
+                       decimal sukuBungaTahunan, DateOnly tanggalPengajuan)
+    {
         if (tenorBulan <= 0)
             throw new AturanBisnisException("Tenor harus lebih dari 0 bulan.");
+        if (sukuBungaTahunan < 0)
+            throw new AturanBisnisException("Suku bunga tidak boleh negatif.");
 
         IdPinjaman = idPinjaman;
         Anggota = anggota;
         TenorBulan = tenorBulan;
+        SukuBungaTahunan = sukuBungaTahunan;
         TanggalPengajuan = tanggalPengajuan;
-        SukuBungaTahunan = parameter.BungaPinjamanBerlaku; // B4 (sudah dijaga <= batas)
     }
 
-    // Polymorphism: tiap jenis pinjaman menghitung pokok dan jadwal dengan caranya
+    // Polymorphism: tiap jenis pinjaman menghitung pokok, jadwal, dan rincian dengan caranya
     public abstract decimal HitungPokokPinjaman();
     public abstract List<Angsuran> BuatJadwalAngsuran(DateOnly tanggalCair);
+    public abstract string Rincian();
 
     // Bunga sebulan dari sisa pokok (bunga efektif), dibulatkan ke rupiah
     protected decimal HitungBungaSebulan(decimal sisaPokok)
         => Math.Round(sisaPokok * (SukuBungaTahunan / 100m) / 12m, 0,
                       MidpointRounding.AwayFromZero);
+
+    // Hanya dipanggil repository saat memuat pinjaman dari database
+    internal void Pulihkan(StatusPinjaman status, DateOnly? tanggalCair,
+                           IEnumerable<Angsuran> angsuran)
+    {
+        _angsuran.Clear();
+        _angsuran.AddRange(angsuran);
+        TanggalCair = tanggalCair;
+        Status = status;
+    }
 
     public void Setujui(DateOnly tanggal)
     {

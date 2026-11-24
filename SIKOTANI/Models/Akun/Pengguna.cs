@@ -11,7 +11,7 @@ public abstract class Pengguna
     internal string PasswordHash => _passwordHash;
 
     // Polymorphism: tiap peran punya nama dan hak akses sendiri
-    public abstract string GetPeran();
+    public abstract string GetPeran();  // ini itu masih mentahan
     public abstract HakAkses GetHakAkses(MenuAplikasi menu);
 
     protected Pengguna(int idPengguna, string username, Anggota anggota,

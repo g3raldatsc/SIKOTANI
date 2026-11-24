@@ -76,7 +76,7 @@ public static class Tema
     {
         string teks = tombol.Text ?? string.Empty;
         Color warna = Primer;
-        if (teks.StartsWith("Hapus") || teks.StartsWith("Keluarkan")) warna = Bahaya;
+        if (teks.StartsWith("Hapus") || teks.StartsWith("Keluarkan") || teks.StartsWith("Tolak")) warna = Bahaya;
         else if (teks == "Tarik") warna = Peringatan;
         else if (teks == "Baru") warna = Sekunder;
 

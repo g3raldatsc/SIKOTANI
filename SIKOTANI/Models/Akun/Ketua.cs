@@ -6,7 +6,7 @@ public class Ketua : Pengguna
                  string passwordHash, bool aktif = true)
         : base(idPengguna, username, anggota, passwordHash, aktif) { }
 
-    public override string GetPeran() => "Ketua";
+    public override string GetPeran() => "Ketua";   // ngeubah alur methodnya dari pengguna.cs
 
     public override HakAkses GetHakAkses(MenuAplikasi menu) => menu switch
     {
