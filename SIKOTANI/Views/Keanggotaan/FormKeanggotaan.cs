@@ -2,7 +2,7 @@
 
 namespace SIKOTANI.Views;
 
-public partial class FormKeanggotaan : Form
+public partial class FormKeanggotaan : UserControl
 {
     public FormKeanggotaan()
     {
@@ -13,9 +13,7 @@ public partial class FormKeanggotaan : Form
         bool bolehKelola = pengguna.BolehKelola(MenuAplikasi.Keanggotaan);
 
         Text = "Anggota, Kelompok Tani, dan Komoditas";
-        StartPosition = FormStartPosition.CenterParent;
         ClientSize = new Size(1040, 620);
-        MinimumSize = new Size(900, 560);
 
         var tabAnggota = new TabAnggota(bolehKelola);
         var tabKelompok = new TabKelompok(bolehKelola);

@@ -4,12 +4,12 @@ public partial class FormSetupAwal : Form
 {
     private readonly AuthController _auth = new();
 
-    private readonly TextBox txtNama = new() { Width = 280 };
-    private readonly TextBox txtUsername = new() { Width = 280 };
-    private readonly TextBox txtPassword = new() { Width = 280, UseSystemPasswordChar = true };
-    private readonly TextBox txtKonfirmasi = new() { Width = 280, UseSystemPasswordChar = true };
-    private readonly Button btnBuat = new() { Text = "Buat Akun", Width = 280, Height = 34, Margin = new Padding(3, 14, 3, 3) };
-    private readonly Label lblPesan = new() { ForeColor = Color.Red, AutoSize = false, Width = 280, Height = 40 };
+    private readonly TextBox txtNama = new() { Width = 340, Font = new Font("Segoe UI", 11f) };
+    private readonly TextBox txtUsername = new() { Width = 340, Font = new Font("Segoe UI", 11f) };
+    private readonly TextBox txtPassword = new() { Width = 340, Font = new Font("Segoe UI", 11f), UseSystemPasswordChar = true };
+    private readonly TextBox txtKonfirmasi = new() { Width = 340, Font = new Font("Segoe UI", 11f), UseSystemPasswordChar = true };
+    private readonly Button btnBuat = new() { Text = "Buat Akun", Width = 340, Height = 44, Margin = new Padding(3, 20, 3, 3) };
+    private readonly Label lblPesan = new() { ForeColor = Tema.Bahaya, AutoSize = false, Width = 340, Height = 44 };
 
     public FormSetupAwal()
     {
@@ -20,32 +20,68 @@ public partial class FormSetupAwal : Form
         StartPosition = FormStartPosition.CenterScreen;
         MaximizeBox = false;
         MinimizeBox = false;
-        ClientSize = new Size(340, 390);
+        ClientSize = new Size(420, 640);
 
-        var panel = new FlowLayoutPanel
+        var kepala = new Panel { Dock = DockStyle.Top, Height = 120, BackColor = Tema.Sidebar };
+        kepala.Controls.Add(new Label
+        {
+            Text = "Pengaturan Awal",
+            ForeColor = Color.White,
+            Font = new Font("Segoe UI Semibold", 20f),
+            AutoSize = false,
+            Left = 0,
+            Top = 28,
+            Width = 420,
+            Height = 44,
+            TextAlign = ContentAlignment.MiddleCenter
+        });
+        kepala.Controls.Add(new Label
+        {
+            Text = "Buat akun Ketua untuk pertama kali",
+            ForeColor = Color.FromArgb(165, 214, 167),
+            Font = new Font("Segoe UI", 10f),
+            AutoSize = false,
+            Left = 0,
+            Top = 76,
+            Width = 420,
+            Height = 24,
+            TextAlign = ContentAlignment.MiddleCenter
+        });
+
+        var badan = new FlowLayoutPanel
         {
             Dock = DockStyle.Fill,
             FlowDirection = FlowDirection.TopDown,
             WrapContents = false,
-            Padding = new Padding(25, 10, 25, 10)
+            Padding = new Padding(38, 14, 38, 10),
+            BackColor = Color.White
         };
 
         void Tambah(string teks, Control kontrol)
         {
-            panel.Controls.Add(new Label { Text = teks, AutoSize = true, Margin = new Padding(3, 10, 3, 0) });
-            panel.Controls.Add(kontrol);
+            badan.Controls.Add(new Label
+            {
+                Text = teks,
+                AutoSize = true,
+                ForeColor = Tema.TeksPudar,
+                Margin = new Padding(3, 10, 3, 4)
+            });
+            badan.Controls.Add(kontrol);
         }
 
         Tambah("Nama lengkap Ketua", txtNama);
         Tambah("Username (min. 3 karakter)", txtUsername);
         Tambah("Kata sandi (min. 8 karakter)", txtPassword);
         Tambah("Ulangi kata sandi", txtKonfirmasi);
-        panel.Controls.Add(btnBuat);
-        panel.Controls.Add(lblPesan);
-        Controls.Add(panel);
+        badan.Controls.Add(btnBuat);
+        badan.Controls.Add(lblPesan);
+
+        Controls.Add(badan);
+        Controls.Add(kepala);
 
         AcceptButton = btnBuat;
         btnBuat.Click += btnBuat_Click;
+        Tema.Terapkan(this);
     }
 
     private void btnBuat_Click(object? sender, EventArgs e)

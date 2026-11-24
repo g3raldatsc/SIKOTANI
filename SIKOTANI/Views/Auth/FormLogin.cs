@@ -3,10 +3,11 @@
 public partial class FormLogin : Form
 {
     private readonly AuthController _auth = new();
-    private readonly TextBox txtUsername = new() { Width = 250 };
-    private readonly TextBox txtPassword = new() { Width = 250, UseSystemPasswordChar = true };
-    private readonly Button btnMasuk = new() { Text = "Masuk", Width = 250, Height = 34, Margin = new Padding(3, 14, 3, 3) };
-    private readonly Label lblPesan = new() { ForeColor = Color.Red, AutoSize = false, Width = 250, Height = 40 };
+
+    private readonly TextBox txtUsername = new() { Width = 340, Font = new Font("Segoe UI", 11f) };
+    private readonly TextBox txtPassword = new() { Width = 340, Font = new Font("Segoe UI", 11f), UseSystemPasswordChar = true };
+    private readonly Button btnMasuk = new() { Text = "Masuk", Width = 340, Height = 44, Margin = new Padding(3, 22, 3, 3) };
+    private readonly Label lblPesan = new() { ForeColor = Tema.Bahaya, AutoSize = false, Width = 340, Height = 48 };
     private int _percobaanGagal;
 
     public FormLogin()
@@ -18,26 +19,64 @@ public partial class FormLogin : Form
         StartPosition = FormStartPosition.CenterScreen;
         MaximizeBox = false;
         MinimizeBox = false;
-        ClientSize = new Size(310, 250);
+        ClientSize = new Size(420, 500);
 
-        var panel = new FlowLayoutPanel
+        var kepala = new Panel { Dock = DockStyle.Top, Height = 150, BackColor = Tema.Sidebar };
+        kepala.Controls.Add(new Label
+        {
+            Text = "SIKOTANI",
+            ForeColor = Color.White,
+            Font = new Font("Segoe UI Semibold", 26f),
+            AutoSize = false,
+            Left = 0,
+            Top = 36,
+            Width = 420,
+            Height = 52,
+            TextAlign = ContentAlignment.MiddleCenter
+        });
+        kepala.Controls.Add(new Label
+        {
+            Text = "Sistem Informasi Koperasi Tani",
+            ForeColor = Color.FromArgb(165, 214, 167),
+            Font = new Font("Segoe UI", 10f),
+            AutoSize = false,
+            Left = 0,
+            Top = 92,
+            Width = 420,
+            Height = 24,
+            TextAlign = ContentAlignment.MiddleCenter
+        });
+
+        var badan = new FlowLayoutPanel
         {
             Dock = DockStyle.Fill,
             FlowDirection = FlowDirection.TopDown,
             WrapContents = false,
-            Padding = new Padding(25, 20, 25, 10)
+            Padding = new Padding(38, 26, 38, 10),
+            BackColor = Color.White
         };
 
-        panel.Controls.Add(new Label { Text = "Username", AutoSize = true });
-        panel.Controls.Add(txtUsername);
-        panel.Controls.Add(new Label { Text = "Kata sandi", AutoSize = true, Margin = new Padding(3, 12, 3, 0) });
-        panel.Controls.Add(txtPassword);
-        panel.Controls.Add(btnMasuk);
-        panel.Controls.Add(lblPesan);
-        Controls.Add(panel);
+        Label Etiket(string teks) => new()
+        {
+            Text = teks,
+            AutoSize = true,
+            ForeColor = Tema.TeksPudar,
+            Margin = new Padding(3, 12, 3, 4)
+        };
+
+        badan.Controls.Add(Etiket("Username"));
+        badan.Controls.Add(txtUsername);
+        badan.Controls.Add(Etiket("Kata sandi"));
+        badan.Controls.Add(txtPassword);
+        badan.Controls.Add(btnMasuk);
+        badan.Controls.Add(lblPesan);
+
+        Controls.Add(badan);    // Fill lebih dulu, lalu panel tepi
+        Controls.Add(kepala);
 
         AcceptButton = btnMasuk;
         btnMasuk.Click += btnMasuk_Click;
+        Tema.Terapkan(this);
     }
 
     private void btnMasuk_Click(object? sender, EventArgs e)

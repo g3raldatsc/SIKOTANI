@@ -2,7 +2,7 @@
 
 namespace SIKOTANI.Views;
 
-public partial class FormDanaAnggota : Form
+public partial class FormDanaAnggota : UserControl
 {
     private readonly AnggotaController _kontrolAnggota = new();
     private readonly DanaController _kontrolDana = new();
@@ -78,9 +78,7 @@ public partial class FormDanaAnggota : Form
         _bolehKelola = pengguna.BolehKelola(MenuAplikasi.DanaAnggota);
 
         Text = "Dana Anggota";
-        StartPosition = FormStartPosition.CenterParent;
         ClientSize = new Size(1100, 660);
-        MinimumSize = new Size(1000, 600);
 
         dtpTanggal.Value = DateTime.Today;
         dtpTanggal.MaxDate = DateTime.Today; // tanggal transaksi tidak boleh di masa depan

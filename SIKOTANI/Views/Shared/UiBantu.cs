@@ -24,7 +24,7 @@ internal static class UiBantu
 
     public static void Pesan(Label label, string teks, bool galat)
     {
-        label.ForeColor = galat ? Color.Red : Color.Green;
+        label.ForeColor = galat ? Tema.Bahaya : Tema.PrimerGelap;
         label.Text = teks;
     }
 }
