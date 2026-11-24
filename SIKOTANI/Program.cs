@@ -1,5 +1,6 @@
 ﻿namespace SIKOTANI;
 
+// hahahaha
 internal static class Program
 {
     [STAThread]
