@@ -100,6 +100,31 @@ public static class PinjamanRepository
             }
         }
 
+        // 3b. Riwayat pembayaran tiap angsuran
+        var semuaAngsuran = jadwal.Values.SelectMany(x => x).ToDictionary(a => a.IdAngsuran);
+        if (semuaAngsuran.Count > 0)
+        {
+            var bayar = semuaAngsuran.Keys.ToDictionary(k => k, _ => new List<PembayaranAngsuran>());
+            using var cmdBayar = new NpgsqlCommand(
+                "SELECT id_angsuran, id_pembayaran, tanggal, jumlah, sumber, id_setoran " +
+                "FROM pembayaran_angsuran WHERE id_angsuran = ANY(@ids) ORDER BY id_pembayaran",
+                koneksi);
+            cmdBayar.Parameters.AddWithValue("ids", semuaAngsuran.Keys.ToArray());
+            using (var r = cmdBayar.ExecuteReader())
+            {
+                while (r.Read())
+                {
+                    int? idSetoran = r.IsDBNull(5) ? null : r.GetInt32(5);
+                    bayar[r.GetInt32(0)].Add(new PembayaranAngsuran(
+                        r.GetFieldValue<DateOnly>(2), r.GetDecimal(3),
+                        Enum.Parse<SumberPembayaran>(r.GetString(4)), idSetoran)
+                    { IdPembayaran = r.GetInt32(1) });
+                }
+            }
+            foreach (var (idAng, daftar) in bayar)
+                semuaAngsuran[idAng].PulihkanPembayaran(daftar);
+        }
+
         // 4. Pulihkan status, tanggal cair, dan jadwal
         foreach (var pj in hasil)
         {
@@ -239,6 +264,53 @@ public static class PinjamanRepository
             cmd.ExecuteNonQuery();
         }
         transaksi.Commit();
+    }
+
+    // ================= Pembayaran =================
+    public static void Bayar(int idPinjaman, int noAngsuran, decimal jumlah, DateOnly tanggal)
+    {
+        PastikanBukanMasaDepan(tanggal, "pembayaran");
+
+        using var koneksi = Database.BukaKoneksi();
+        using var transaksi = koneksi.BeginTransaction();
+        Kunci(koneksi, transaksi, idPinjaman);   // dua pembayaran bersamaan diproses bergantian
+
+        var pinjaman = CariById(idPinjaman)
+            ?? throw new AturanBisnisException("Data pinjaman tidak ditemukan.");
+
+        // Aturan domain: pinjaman Aktif, tanggal valid, tidak melebihi sisa tagihan
+        pinjaman.BayarAngsuran(noAngsuran, jumlah, tanggal, SumberPembayaran.Tunai);
+
+        var angsuran = pinjaman.JadwalAngsuran.First(a => a.NoAngsuran == noAngsuran);
+        var catatan = angsuran.Pembayaran.Last();
+
+        using (var cmd = new NpgsqlCommand(@"
+            INSERT INTO pembayaran_angsuran (id_angsuran, tanggal, jumlah, sumber, id_setoran)
+            VALUES (@ang, @tgl, @jumlah, 'Tunai', NULL)", koneksi, transaksi))
+        {
+            cmd.Parameters.AddWithValue("ang", angsuran.IdAngsuran);
+            cmd.Parameters.AddWithValue("tgl", catatan.Tanggal);
+            cmd.Parameters.AddWithValue("jumlah", catatan.Jumlah);
+            cmd.ExecuteNonQuery();
+        }
+
+        using (var cmd = new NpgsqlCommand(
+            "UPDATE angsuran SET status = @status WHERE id_angsuran = @ang", koneksi, transaksi))
+        {
+            cmd.Parameters.AddWithValue("status", angsuran.Status.ToString());
+            cmd.Parameters.AddWithValue("ang", angsuran.IdAngsuran);
+            cmd.ExecuteNonQuery();
+        }
+
+        if (pinjaman.Status == StatusPinjaman.Lunas)
+        {
+            using var cmd = new NpgsqlCommand(
+                "UPDATE pinjaman SET status = 'Lunas' WHERE id_pinjaman = @id", koneksi, transaksi);
+            cmd.Parameters.AddWithValue("id", idPinjaman);
+            cmd.ExecuteNonQuery();
+        }
+
+        transaksi.Commit();   // pembayaran, status angsuran, dan status pinjaman: satu kesatuan
     }
 
     // ================= Pembantu =================

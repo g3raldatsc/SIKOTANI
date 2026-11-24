@@ -5,12 +5,13 @@ namespace SIKOTANI.Controllers;
 
 public class PinjamanController : ControllerDasar
 {
-    // Data pinjaman boleh dilihat oleh peran yang punya akses pengajuan atau persetujuan
+    // Data pinjaman boleh dilihat oleh peran yang punya akses pengajuan, persetujuan, atau pembayaran
     private static void PastikanBolehLihatPinjaman()
     {
         var pengguna = PenggunaSaatIni;
         if (!pengguna.BolehAkses(MenuAplikasi.PengajuanPinjaman) &&
-            !pengguna.BolehAkses(MenuAplikasi.PersetujuanPinjaman))
+            !pengguna.BolehAkses(MenuAplikasi.PersetujuanPinjaman) &&
+            !pengguna.BolehAkses(MenuAplikasi.PembayaranAngsuran))
             throw new AturanBisnisException(
                 $"Peran {pengguna.GetPeran()} tidak berhak melihat data pinjaman.");
     }
@@ -58,5 +59,12 @@ public class PinjamanController : ControllerDasar
     {
         PastikanBolehKelola(MenuAplikasi.PersetujuanPinjaman);
         PinjamanRepository.Tolak(idPinjaman);
+    }
+
+    // ----- Pembayaran angsuran (Bendahara) -----
+    public void BayarAngsuran(int idPinjaman, int noAngsuran, decimal jumlah, DateOnly tanggal)
+    {
+        PastikanBolehKelola(MenuAplikasi.PembayaranAngsuran);
+        PinjamanRepository.Bayar(idPinjaman, noAngsuran, jumlah, tanggal);
     }
 }

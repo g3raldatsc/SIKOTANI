@@ -93,6 +93,10 @@ public abstract class Pinjaman
         if (Status != StatusPinjaman.Aktif)
             throw new AturanBisnisException("Pinjaman tidak berstatus Aktif.");
 
+        if (TanggalCair is DateOnly cair && tanggal < cair)
+            throw new AturanBisnisException(
+                "Tanggal pembayaran tidak boleh sebelum tanggal cair.");
+
         var angsuran = _angsuran.FirstOrDefault(a => a.NoAngsuran == noAngsuran)
             ?? throw new AturanBisnisException($"Angsuran ke-{noAngsuran} tidak ditemukan.");
 

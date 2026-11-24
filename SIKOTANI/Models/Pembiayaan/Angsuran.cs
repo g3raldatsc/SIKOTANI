@@ -2,7 +2,7 @@
 
 public class Angsuran
 {
-    private readonly List<PembayaranAngsuran> _pembayaran = new(); // composition
+    private readonly List<PembayaranAngsuran> _pembayaran = new();   // composition
 
     public int IdAngsuran { get; internal set; }
     public int NoAngsuran { get; }
@@ -33,6 +33,18 @@ public class Angsuran
     public decimal GetSisaPokok()
         => Pokok - Math.Max(0m, GetTerbayar() - Bunga);
 
+    // Hanya penanda tampilan; tidak ada denda dan tagihan tidak berubah
+    public bool Terlambat(DateOnly hariIni)
+        => Status != StatusAngsuran.Lunas && JatuhTempo < hariIni;
+
+    // Hanya dipanggil repository saat memuat jadwal dari database
+    internal void PulihkanPembayaran(IEnumerable<PembayaranAngsuran> pembayaran)
+    {
+        _pembayaran.Clear();
+        _pembayaran.AddRange(pembayaran);
+        HitungUlangStatus();
+    }
+
     // internal: hanya Pinjaman yang boleh mencatat pembayaran
     internal void CatatPembayaran(PembayaranAngsuran pembayaran)
     {
@@ -43,6 +55,14 @@ public class Angsuran
                 $"Pembayaran melebihi sisa tagihan angsuran (Rp{GetSisaTagihan():N0}).");
 
         _pembayaran.Add(pembayaran);
-        Status = GetSisaTagihan() == 0m ? StatusAngsuran.Lunas : StatusAngsuran.Sebagian;
+        HitungUlangStatus();
+    }
+
+    private void HitungUlangStatus()
+    {
+        decimal terbayar = GetTerbayar();
+        Status = terbayar <= 0m ? StatusAngsuran.Belum
+               : terbayar >= HitungTagihan() ? StatusAngsuran.Lunas
+               : StatusAngsuran.Sebagian;
     }
 }

@@ -6,6 +6,11 @@ internal static class Program
     [STAThread]
     static void Main()
     {
+        var budaya = new System.Globalization.CultureInfo("id-ID");
+        System.Globalization.CultureInfo.DefaultThreadCurrentCulture = budaya;
+        System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = budaya;
+        Thread.CurrentThread.CurrentCulture = budaya;
+        Thread.CurrentThread.CurrentUICulture = budaya;
         ApplicationConfiguration.Initialize();
         var auth = new AuthController();
 
