@@ -2,6 +2,7 @@ using SIKOTANI.Data;
 
 namespace SIKOTANI;
 
+// im not gay
 internal static class Program
 {
     [STAThread]
