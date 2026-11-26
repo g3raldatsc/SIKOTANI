@@ -55,7 +55,7 @@ public partial class FormUtama : Form
 
         // KANAN: header dan isi
         var header = new Panel { Dock = DockStyle.Top, Height = 74, BackColor = Color.White };
-        lblTanggal.Text = DateTime.Today.ToString("dddd, d MMMM yyyy");
+        lblTanggal.Text = DateTime.Today.ToString("dddd, d MMMM yyyy", FormatTeks.Budaya);
         header.Controls.Add(lblTanggal);
         header.Controls.Add(lblJudul);
         header.Controls.Add(lblSub);

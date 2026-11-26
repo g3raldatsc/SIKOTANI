@@ -71,6 +71,9 @@ public class HalamanSetoran : UserControl
         dtpSetoran.Value = DateTime.Today;
         dtpPotong.MaxDate = DateTime.Today;
         dtpPotong.Value = DateTime.Today;
+        #if !DEBUG
+        chkSimulasi.Visible = false;   // alat uji T10: hanya tampil saat dijalankan dari Visual Studio (Debug)
+        #endif
         PerbaruiNilai();
 
         var (tabSetoran, isiSetoran, bawahSetoran) = BuatTab("Setoran Baru");
