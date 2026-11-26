@@ -1,6 +1,6 @@
 ﻿namespace SIKOTANI.Views;
 
-/// <summary>Satu-satunya tempat warna, huruf, dan gaya aplikasi. Ubah di sini, semua tampilan ikut berubah.</summary>
+/// <summary>Satu-satunya tempat warna, huruf, dan gaya aplikasi. Ubah di sini, semua tampilan ikut berubah :3</summary>
 public static class Tema
 {
     // iki warna e buat tema (kalau ga sesuai nanti diganti)
@@ -39,7 +39,7 @@ public static class Tema
         return string.Empty;
     }
 
-    public static string Rp(decimal nilai) => "Rp" + nilai.ToString("N0");
+    public static string Rp(decimal nilai) => FormatTeks.Rp(nilai);
 
     // Penerapan otomatis pada form beserta seluruh isinya
     public static void Terapkan(Control akar)
@@ -62,10 +62,10 @@ public static class Tema
                     break;
                 case TabPage halaman:
                     halaman.UseVisualStyleBackColor = false;
-                    halaman.BackColor = Latar;
+                    halaman.BackColor = halaman.Tag is "kartu" ? Kartu : Latar;
                     break;
                 case FlowLayoutPanel panel when panel.Dock == DockStyle.Right:
-                    panel.BackColor = Kartu;    // panel input di sisi kanan menjadi "kartu" putih
+                    panel.BackColor = Kartu;    // panel input di sisi kanan menjadi kartu putih
                     break;
             }
             Gaya(anak);
@@ -76,9 +76,10 @@ public static class Tema
     {
         string teks = tombol.Text ?? string.Empty;
         Color warna = Primer;
-        if (teks.StartsWith("Hapus") || teks.StartsWith("Keluarkan") || teks.StartsWith("Tolak")) warna = Bahaya;
+        if (teks.StartsWith("Hapus") || teks.StartsWith("Keluarkan") ||
+            teks.StartsWith("Tolak") || teks.StartsWith("Nonaktifkan")) warna = Bahaya;
         else if (teks == "Tarik") warna = Peringatan;
-        else if (teks == "Baru") warna = Sekunder;
+        else if (teks == "Baru" || teks.StartsWith("Batalkan")) warna = Sekunder;
 
         tombol.FlatStyle = FlatStyle.Flat;
         tombol.FlatAppearance.BorderSize = 0;

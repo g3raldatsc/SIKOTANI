@@ -99,7 +99,7 @@ public class TabKelompok : UserControl
         {
             foreach (DataGridViewRow baris in grid.Rows)
             {
-                if ((int)baris.Cells["IdKelompok"].Value == id)
+                if (Convert.ToInt32(baris.Cells["IdKelompok"].Value) == id)
                 {
                     baris.Selected = true;
                     ketemu = true;
@@ -116,7 +116,7 @@ public class TabKelompok : UserControl
     {
         if (_mengisi || grid.SelectedRows.Count == 0) return;
 
-        int id = (int)grid.SelectedRows[0].Cells["IdKelompok"].Value;
+        int id = Convert.ToInt32(grid.SelectedRows[0].Cells["IdKelompok"].Value);
         var kelompok = _daftar.First(k => k.IdKelompok == id);
         _idTerpilih = id;
 

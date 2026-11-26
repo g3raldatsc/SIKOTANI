@@ -212,7 +212,7 @@ public class HalamanPembayaran : UserControl
         {
             foreach (DataGridViewRow baris in gridPinjaman.Rows)
             {
-                if ((int)baris.Cells["IdPinjaman"].Value == id)
+                if (Convert.ToInt32(baris.Cells["IdPinjaman"].Value) == id)
                 {
                     baris.Selected = true;
                     break;
@@ -232,7 +232,7 @@ public class HalamanPembayaran : UserControl
         }
         else
         {
-            int id = (int)gridPinjaman.SelectedRows[0].Cells["IdPinjaman"].Value;
+            int id = Convert.ToInt32(gridPinjaman.SelectedRows[0].Cells["IdPinjaman"].Value);
             _terpilih = _tampil.FirstOrDefault(x => x.IdPinjaman == id);
         }
         TampilkanRincian();

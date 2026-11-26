@@ -94,8 +94,8 @@ public class TabKomoditas : UserControl
     private void Hapus()
     {
         if (grid.SelectedRows.Count == 0) return;
-        int id = (int)grid.SelectedRows[0].Cells["IdKomoditas"].Value;
-        string nama = (string)grid.SelectedRows[0].Cells["Nama"].Value;
+        int id = Convert.ToInt32(grid.SelectedRows[0].Cells["IdKomoditas"].Value);
+        string nama = (Convert.ToString(grid.SelectedRows[0].Cells["Nama"].Value) ?? string.Empty);
 
         var jawab = MessageBox.Show(
             $"Hapus komoditas {nama}?\nTanda komoditas itu pada data anggota ikut dilepas.",

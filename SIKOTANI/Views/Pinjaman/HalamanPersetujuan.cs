@@ -159,7 +159,7 @@ public class HalamanPersetujuan : UserControl
             return;
         }
 
-        int id = (int)gridMenunggu.SelectedRows[0].Cells["IdPinjaman"].Value;
+        int id = Convert.ToInt32(gridMenunggu.SelectedRows[0].Cells["IdPinjaman"].Value);
         _terpilih = _menunggu.First(x => x.IdPinjaman == id);
         lblInfo.Text =
             $"Pinjaman #{_terpilih.IdPinjaman}\nAnggota: {_terpilih.Anggota.Nama}\n" +

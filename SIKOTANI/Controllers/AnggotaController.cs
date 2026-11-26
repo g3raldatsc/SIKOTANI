@@ -17,8 +17,7 @@ public class AnggotaController : ControllerDasar
         return AnggotaRepository.CariById(id);
     }
 
-    public int Tambah(string nama, string alamat, string noTelepon,
-                      DateOnly tanggalGabung, decimal luasLahanHa)
+    public int Tambah(string nama, string alamat, string noTelepon, DateOnly tanggalGabung, decimal luasLahanHa)
     {
         PastikanBolehKelola(MenuAplikasi.Keanggotaan);
         return AnggotaRepository.Tambah(nama, alamat, noTelepon, tanggalGabung, luasLahanHa);

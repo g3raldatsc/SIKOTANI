@@ -7,7 +7,7 @@ public class AuthController : ControllerDasar
 {
     public bool BelumAdaPengguna() => PenggunaRepository.BelumAdaPengguna();
 
-    /// <summary>Mengembalikan true bila berhasil masuk (sesi terisi).</summary>
+    /// <summary>ini bakal ngembalikan true bila berhasil masuk (sesi terisi).</summary>
     public bool Masuk(string username, string kataSandi)
     {
         var pengguna = PenggunaRepository.CariByUsername(username);
@@ -23,30 +23,18 @@ public class AuthController : ControllerDasar
     public void BuatKetuaAwal(string nama, string username, string kataSandi)
         => PenggunaRepository.BuatKetuaAwal(nama, username, kataSandi);
 
-    // Sementara: dihapus pada Tahap 10 saat Form Parameter dan Akun jadi
-    public string BuatAkunContoh()
+    /// <summary>Setiap pengguna dapat mengubah kata sandinya sendiri.</summary>
+    public void UbahKataSandiSaya(string kataSandiLama, string kataSandiBaru)
     {
-        PastikanBolehKelola(MenuAplikasi.ParameterDanAkun);
+        var saya = PenggunaSaatIni;
+        if (!saya.VerifikasiKataSandi(kataSandiLama))
+            throw new AturanBisnisException("Kata sandi lama salah.");
 
-        var hasil = new System.Text.StringBuilder();
-        var akun = new[]
-        {
-            ("Sekretaris Contoh", "sekretaris1", "Sekretaris"),
-            ("Bendahara Contoh",  "bendahara1",  "Bendahara")
-        };
+        string hashBaru = KataSandi.Hash(kataSandiBaru);   // validasi minimal 8 karakter
+        PenggunaRepository.AturKataSandi(saya.IdPengguna, hashBaru);
 
-        foreach (var (nama, username, peran) in akun)
-        {
-            try
-            {
-                PenggunaRepository.BuatPengguna(nama, username, "contoh1234", peran);
-                hasil.AppendLine($"Dibuat: {username} ({peran})");
-            }
-            catch (AturanBisnisException ex)
-            {
-                hasil.AppendLine($"{username}: {ex.Message}");
-            }
-        }
-        return hasil.ToString();
+        // Muat ulang agar objek sesi memakai hash terbaru
+        var terbaru = PenggunaRepository.CariById(saya.IdPengguna);
+        if (terbaru is not null) Sesi.Masuk(terbaru);
     }
 }

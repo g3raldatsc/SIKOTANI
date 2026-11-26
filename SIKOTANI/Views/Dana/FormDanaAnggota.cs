@@ -191,7 +191,7 @@ public partial class FormDanaAnggota : UserControl
         {
             foreach (DataGridViewRow baris in gridAnggota.Rows)
             {
-                if ((int)baris.Cells["IdAnggota"].Value == id)
+                if (Convert.ToInt32(baris.Cells["IdAnggota"].Value) == id)
                 {
                     baris.Selected = true;
                     break;
@@ -211,7 +211,7 @@ public partial class FormDanaAnggota : UserControl
         }
         else
         {
-            int id = (int)gridAnggota.SelectedRows[0].Cells["IdAnggota"].Value;
+            int id = Convert.ToInt32(gridAnggota.SelectedRows[0].Cells["IdAnggota"].Value);
             _terpilih = _anggota.FirstOrDefault(a => a.IdAnggota == id);
         }
         MuatDana(null);
@@ -258,7 +258,7 @@ public partial class FormDanaAnggota : UserControl
         DataGridViewRow? pilih = null;
         foreach (DataGridViewRow baris in gridDana.Rows)
         {
-            if (pilihIdDana is int id && (int)baris.Cells["IdDana"].Value == id)
+            if (pilihIdDana is int id && Convert.ToInt32(baris.Cells["IdDana"].Value) == id)
             {
                 pilih = baris;
                 break;
@@ -285,7 +285,7 @@ public partial class FormDanaAnggota : UserControl
             return;
         }
 
-        int id = (int)gridDana.SelectedRows[0].Cells["IdDana"].Value;
+        int id = Convert.ToInt32(gridDana.SelectedRows[0].Cells["IdDana"].Value);
         _danaTerpilih = _dana.First(d => d.IdDana == id);
 
         try

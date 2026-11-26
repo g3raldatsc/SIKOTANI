@@ -53,9 +53,8 @@ public class HalamanPengajuan : UserControl
     private readonly Button btnHapusItem = new() { Text = "Hapus Item Terpilih", Width = 360, Height = 30 };
     private readonly Label lblTotal = new() { AutoSize = true, Font = Tema.HurufTebal, Margin = new Padding(3, 8, 3, 0) };
 
-    private readonly Button btnAjukan = new() { Text = "Ajukan Pinjaman", Width = 360, Height = 42, Margin = new Padding(3, 18, 3, 3) };
-
-    // Pesan ditaruh di panel tetap di dasar (tidak ikut tergulung), agar selalu terlihat
+    // Tombol Ajukan dan pesan berada di panel tetap di dasar (tidak ikut tergulung)
+    private readonly Button btnAjukan = new() { Text = "Ajukan Pinjaman", Dock = DockStyle.Top, Height = 44 };
     private readonly Label lblPesan = new() { AutoSize = false, Dock = DockStyle.Fill, Margin = Padding.Empty };
 
     private List<Anggota> _anggota = new();
@@ -106,21 +105,26 @@ public class HalamanPengajuan : UserControl
         panelSaprodi.Controls.Add(lblTotal);
         kanan.Controls.Add(panelSaprodi);
 
-        kanan.Controls.Add(btnAjukan);
         kanan.Enabled = bolehKelola;   // Ketua: hanya melihat
 
-        var panelPesan = new Panel
+        // Tombol Ajukan dan pesan ditaruh di panel tetap di dasar: selalu terlihat
+        // dan tidak ikut tergulung bersama formulir yang panjang
+        btnAjukan.Enabled = bolehKelola;
+        lblPesan.Padding = new Padding(0, 8, 0, 0);
+
+        var panelAksi = new Panel
         {
             Dock = DockStyle.Bottom,
-            Height = 70,
+            Height = 130,
             BackColor = Tema.Kartu,
-            Padding = new Padding(14, 8, 14, 8)
+            Padding = new Padding(14, 10, 14, 8)
         };
-        panelPesan.Controls.Add(lblPesan);
+        panelAksi.Controls.Add(lblPesan);      // Fill lebih dulu
+        panelAksi.Controls.Add(btnAjukan);     // lalu tombol di atas pesan
 
         var kananLuar = new Panel { Dock = DockStyle.Right, Width = 400, BackColor = Tema.Kartu };
-        kananLuar.Controls.Add(kanan);        // Fill lebih dulu
-        kananLuar.Controls.Add(panelPesan);   // lalu panel tepi bawah
+        kananLuar.Controls.Add(kanan);         // Fill lebih dulu
+        kananLuar.Controls.Add(panelAksi);     // lalu panel tepi bawah
 
         // ---------- panel kiri: daftar dan jadwal ----------
         var panelAtas = new Panel { Dock = DockStyle.Top, Height = 270 };
@@ -207,7 +211,7 @@ public class HalamanPengajuan : UserControl
         {
             foreach (DataGridViewRow baris in gridPinjaman.Rows)
             {
-                if ((int)baris.Cells["IdPinjaman"].Value == id)
+                if (Convert.ToInt32(baris.Cells["IdPinjaman"].Value) == id)
                 {
                     baris.Selected = true;
                     break;
@@ -229,7 +233,7 @@ public class HalamanPengajuan : UserControl
             return;
         }
 
-        int id = (int)gridPinjaman.SelectedRows[0].Cells["IdPinjaman"].Value;
+        int id = Convert.ToInt32(gridPinjaman.SelectedRows[0].Cells["IdPinjaman"].Value);
         var pinjaman = _pinjaman.First(x => x.IdPinjaman == id);
 
         // Polymorphism: Rincian() berbeda per jenis pinjaman

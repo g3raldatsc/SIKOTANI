@@ -48,6 +48,10 @@ public partial class FormUtama : Form
         _modul[MenuAplikasi.PengajuanPinjaman] = () => new HalamanPengajuan();
         _modul[MenuAplikasi.PersetujuanPinjaman] = () => new HalamanPersetujuan();
         _modul[MenuAplikasi.PembayaranAngsuran] = () => new HalamanPembayaran();
+        _modul[MenuAplikasi.SetoranPanen] = () => new HalamanSetoran();
+        _modul[MenuAplikasi.ParameterDanAkun] = () => new HalamanParameter();
+        _modul[MenuAplikasi.LaporanAnggota] = () => new HalamanLaporanAnggota();
+        _modul[MenuAplikasi.LaporanKeuangan] = () => new HalamanLaporanKeuangan();
 
         // KANAN: header dan isi
         var header = new Panel { Dock = DockStyle.Top, Height = 74, BackColor = Color.White };
@@ -139,16 +143,8 @@ public partial class FormUtama : Form
             panelMenu.Controls.Add(item);
         }
 
-        // Tombol sementara: hanya untuk Ketua, dihapus di Tahap 10
-        if (_pengguna.BolehKelola(MenuAplikasi.ParameterDanAkun))
-        {
-            var itemContoh = BuatItem("\uE713", "[Sementara] Akun Contoh");
-            itemContoh.Margin = new Padding(0, 18, 0, 4);
-            itemContoh.Click += (_, _) => BuatAkunContoh();
-            panelMenu.Controls.Add(itemContoh);
-        }
+        var bawah = new Panel { Dock = DockStyle.Bottom, Height = 112, BackColor = Tema.Sidebar, Padding = new Padding(10, 8, 10, 8) };
 
-        var bawah = new Panel { Dock = DockStyle.Bottom, Height = 62, BackColor = Tema.Sidebar, Padding = new Padding(10, 8, 10, 8) };
         var itemKeluar = BuatItem("\uE7E8", "Keluar (ganti pengguna)");
         itemKeluar.Dock = DockStyle.Fill;
         itemKeluar.Click += (_, _) =>
@@ -156,7 +152,17 @@ public partial class FormUtama : Form
             _auth.Keluar();   // Program.cs menampilkan login lagi
             Close();
         };
-        bawah.Controls.Add(itemKeluar);
+
+        var itemSandi = BuatItem("\uE72E", "Ubah Kata Sandi");
+        itemSandi.Dock = DockStyle.Top;
+        itemSandi.Click += (_, _) =>
+        {
+            using var dialog = new DialogUbahSandi();
+            dialog.ShowDialog(this);
+        };
+
+        bawah.Controls.Add(itemKeluar);   // Fill lebih dulu
+        bawah.Controls.Add(itemSandi);
 
         // Urutan Add: Fill dahulu, lalu panel tepi (yang terakhir ditempel paling luar)
         sidebar.Controls.Add(panelMenu);
@@ -287,19 +293,5 @@ public partial class FormUtama : Form
             ForeColor = Tema.TeksPudar,
             Text = $"Modul ini dibuat pada Tahap {tahap}."
         });
-    }
-
-    private void BuatAkunContoh()
-    {
-        try
-        {
-            string hasil = _auth.BuatAkunContoh();
-            MessageBox.Show(hasil + "\nKata sandi akun contoh: contoh1234\n(data uji)",
-                "SIKOTANI", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-        catch (AturanBisnisException ex)
-        {
-            MessageBox.Show(ex.Message, "SIKOTANI", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        }
     }
 }

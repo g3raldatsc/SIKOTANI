@@ -2,20 +2,30 @@
 
 public class SetoranPanen
 {
-    private decimal _terpakai; // bagian nilai setoran yang sudah dipotong
+    private decimal _terpakai;   // bagian nilai setoran yang sudah dipotong
 
     public int IdSetoran { get; internal set; }
-    public Anggota Anggota { get; } // association
-    public Komoditas Komoditas { get; } // association
+    public Anggota Anggota { get; }         // association
+    public Komoditas Komoditas { get; }     // association
     public DateOnly Tanggal { get; }
     public decimal BeratKg { get; }
     public decimal HargaPerKg { get; }
+    public decimal Terpakai => _terpakai;
 
+    // Setoran baru: anggota harus Aktif
     public SetoranPanen(int idSetoran, Anggota anggota, Komoditas komoditas,
                         DateOnly tanggal, decimal beratKg, decimal hargaPerKg)
+        : this(idSetoran, anggota, komoditas, tanggal, beratKg, hargaPerKg, 0m)
     {
         if (!anggota.Aktif)
             throw new AturanBisnisException("Anggota sudah keluar, setoran panen ditolak.");
+    }
+
+    // Pemulihan dari database: anggota yang kini sudah keluar tetap memiliki riwayat setorannya
+    internal SetoranPanen(int idSetoran, Anggota anggota, Komoditas komoditas,
+                          DateOnly tanggal, decimal beratKg, decimal hargaPerKg,
+                          decimal terpakai)
+    {
         if (beratKg <= 0)
             throw new AturanBisnisException("Berat setoran harus lebih dari 0 kg.");
         if (hargaPerKg < 0)
@@ -27,6 +37,10 @@ public class SetoranPanen
         Tanggal = tanggal;
         BeratKg = beratKg;
         HargaPerKg = hargaPerKg;
+
+        if (terpakai < 0 || terpakai > HitungNilai())
+            throw new AturanBisnisException("Nilai terpakai setoran tidak valid.");
+        _terpakai = terpakai;
     }
 
     // B9: nilai = berat x harga per kg
@@ -44,12 +58,16 @@ public class SetoranPanen
         if (pinjaman.Anggota.IdAnggota != Anggota.IdAnggota)
             throw new AturanBisnisException(
                 "Setoran hanya dapat dipotong untuk pinjaman milik anggota yang sama.");
+        if (tanggal < Tanggal)
+            throw new AturanBisnisException(
+                "Tanggal pemotongan tidak boleh sebelum tanggal setoran.");
         if (jumlah > HitungNilaiTersedia())
             throw new AturanBisnisException(
                 "Jumlah potongan melebihi nilai setoran yang tersedia.");
 
         // Bila ini gagal (misalnya melebihi tagihan), _terpakai belum berubah.
-        pinjaman.BayarAngsuran(noAngsuran, jumlah, tanggal, SumberPembayaran.PotongPanen, this);
+        pinjaman.BayarAngsuran(noAngsuran, jumlah, tanggal,
+                               SumberPembayaran.PotongPanen, this);
         _terpakai += jumlah;
     }
 }
